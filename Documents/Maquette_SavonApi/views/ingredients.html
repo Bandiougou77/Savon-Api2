@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingrédients</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+
+<header>
+    <h1>Ingrédients</h1>
+    <nav>
+        <a href="index.html">Accueil</a>
+        <a href="ingredients.html">Ingrédients</a>
+        <a href="recette.html">Procédé</a>
+        <a href="simulation.html">Simulation</a>
+    </nav>
+</header>
+
+<section class="container">
+    <h2>Ajouter un ingrédient</h2>
+
+    <input type="text" id="nouvelIngredient" placeholder="Nom de l’ingrédient">
+    <button onclick="ajouterIngredient()">Ajouter</button>
+
+    <ul id="listeIngredients">
+        <li>Huile d’olive</li>
+        <li>Huile de coco</li>
+        <li>Soude caustique (NaOH)</li>
+    </ul>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
