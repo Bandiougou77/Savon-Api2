@@ -1,31 +1,988 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accueil - Simulateur Savon</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SavonSAP – Simulateur de Saponification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ============================
+       VARIABLES & RESET
+    ============================ */
+    :root {
+      --violet:      #5b2d8e;
+      --violet-dark: #3d1a63;
+      --violet-light:#8b5bc4;
+      --green:       #7ab648;
+      --green-dark:  #5a8a30;
+      --green-light: #a8d87a;
+      --cream:       #f8f5f0;
+      --white:       #ffffff;
+      --gray-50:     #f9fafb;
+      --gray-100:    #f3f4f6;
+      --gray-200:    #e5e7eb;
+      --gray-400:    #9ca3af;
+      --gray-600:    #4b5563;
+      --gray-800:    #1f2937;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,.08);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg:   0 8px 32px rgba(91,45,142,.12);
+      --radius:      12px;
+      --radius-lg:   20px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--gray-800);
+      min-height: 100vh;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../style/style.css">
+    /* ============================
+       NAV
+    ============================ */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 68px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: .75rem;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--violet) 0%, var(--green) 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.1rem; font-weight: 700;
+    }
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--violet-dark);
+      letter-spacing: -.5px;
+    }
+    .logo-text span { color: var(--green); }
+    .nav-links {
+      display: flex; gap: .25rem; list-style: none;
+    }
+    .nav-links a {
+      display: block; padding: .5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: .9rem; font-weight: 500;
+      color: var(--gray-600);
+      transition: all .2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: var(--violet-dark);
+      color: white;
+    }
+    .nav-cta {
+      background: var(--green);
+      color: white !important;
+      border-radius: 8px;
+      padding: .5rem 1.25rem !important;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: var(--green-dark) !important; color: white !important; }
+
+    /* ============================
+       HERO
+    ============================ */
+    .hero {
+      background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet) 60%, #7c3aed 100%);
+      color: white;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 100px;
+      padding: .35rem 1rem;
+      font-size: .8rem; font-weight: 500;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(4px);
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero h1 span { color: var(--green-light); }
+    .hero p {
+      font-size: 1.1rem; color: rgba(255,255,255,.8);
+      max-width: 560px; margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .8rem 1.75rem;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem; font-weight: 600;
+      cursor: pointer; border: none;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 4px 14px rgba(122,182,72,.4);
+    }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn-outline {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border: 1.5px solid rgba(255,255,255,.4);
+      backdrop-filter: blur(4px);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,.2); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 3rem; padding-top: 2.5rem;
+      border-top: 1px solid rgba(255,255,255,.15);
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 700;
+      color: var(--green-light); line-height: 1;
+    }
+    .stat-label { font-size: .8rem; color: rgba(255,255,255,.6); margin-top: .25rem; }
+
+    /* ============================
+       MAIN LAYOUT
+    ============================ */
+    .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--violet-dark);
+      margin-bottom: .5rem;
+    }
+    .section-sub {
+      color: var(--gray-400);
+      font-size: .9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ============================
+       FEATURE FLAGS / INDICATEURS
+    ============================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .feature-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      transition: all .25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--violet), var(--green));
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .feature-icon.violet { background: rgba(91,45,142,.1); }
+    .feature-icon.green  { background: rgba(122,182,72,.1); }
+    .feature-icon.amber  { background: rgba(245,158,11,.1); }
+    .feature-icon.blue   { background: rgba(59,130,246,.1); }
+
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      display: inline-block; width: 48px; height: 26px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: var(--gray-200); border-radius: 100px;
+      transition: .3s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 20px; width: 20px;
+      left: 3px; bottom: 3px;
+      background: white; border-radius: 50%;
+      transition: .3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(22px); }
+
+    .feature-name {
+      font-weight: 600; font-size: 1rem;
+      color: var(--gray-800); margin-bottom: .25rem;
+    }
+    .feature-desc {
+      font-size: .85rem; color: var(--gray-400);
+      line-height: 1.5; margin-bottom: 1rem;
+    }
+    .feature-meta {
+      display: flex; gap: .5rem; flex-wrap: wrap;
+    }
+    .tag {
+      font-size: .72rem; font-weight: 600;
+      padding: .2rem .65rem; border-radius: 100px;
+      letter-spacing: .03em;
+    }
+    .tag-violet { background: rgba(91,45,142,.1); color: var(--violet); }
+    .tag-green  { background: rgba(122,182,72,.15); color: var(--green-dark); }
+    .tag-amber  { background: rgba(245,158,11,.1); color: #d97706; }
+    .tag-blue   { background: rgba(59,130,246,.1); color: #2563eb; }
+    .tag-gray   { background: var(--gray-100); color: var(--gray-600); }
+
+    /* ============================
+       SIMULATOR SECTION
+    ============================ */
+    .sim-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+    .sim-header {
+      background: linear-gradient(135deg, var(--violet-dark), var(--violet));
+      color: white; padding: 1.75rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .sim-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 700;
+    }
+    .sim-header p { font-size: .85rem; color: rgba(255,255,255,.7); margin-top: .25rem; }
+    .sim-body { padding: 2rem; }
+
+    .ingredients-list { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1.5rem; }
+    .ingredient-row {
+      display: grid; grid-template-columns: 1fr 120px 40px;
+      gap: .75rem; align-items: center;
+    }
+    .ingredient-row select,
+    .ingredient-row input[type="number"] {
+      width: 100%; padding: .65rem 1rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; color: var(--gray-800);
+      background: var(--gray-50);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .ingredient-row select:focus,
+    .ingredient-row input:focus { border-color: var(--violet-light); background: white; }
+    .btn-remove {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(239,68,68,.1);
+      border: none; cursor: pointer;
+      color: #ef4444; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .btn-remove:hover { background: #ef4444; color: white; }
+
+    .sim-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .btn-add {
+      background: rgba(91,45,142,.1);
+      color: var(--violet);
+      border: 1.5px dashed var(--violet-light);
+      padding: .65rem 1.25rem;
+      border-radius: 8px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
+      display: flex; align-items: center; gap: .4rem;
+      transition: all .2s;
+    }
+    .btn-add:hover { background: var(--violet); color: white; border-style: solid; }
+    .btn-calc {
+      background: linear-gradient(135deg, var(--violet), var(--violet-light));
+      color: white; border: none; padding: .7rem 1.75rem;
+      border-radius: 8px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+      box-shadow: 0 4px 12px rgba(91,45,142,.3);
+      display: flex; align-items: center; gap: .4rem;
+      transition: all .2s;
+    }
+    .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(91,45,142,.4); }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(122,182,72,.08), rgba(91,45,142,.06));
+      border: 1.5px solid var(--green);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .result-main { flex: 1; }
+    .result-label { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); }
+    .result-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 700; color: var(--violet-dark);
+      line-height: 1;
+    }
+    .result-value span { font-size: 1.2rem; font-weight: 400; color: var(--gray-400); }
+    .result-breakdown {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .result-sub { text-align: center; }
+    .result-sub-val { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--gray-800); }
+    .result-sub-label { font-size: .75rem; color: var(--gray-400); }
+
+    /* ============================
+       NAMES SECTION
+    ============================ */
+    .names-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem; margin-bottom: 3rem;
+    }
+    .name-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      border: 2px solid var(--gray-200);
+      cursor: pointer; transition: all .2s;
+      text-align: center;
+    }
+    .name-card:hover { border-color: var(--violet-light); transform: translateY(-2px); }
+    .name-card.selected { border-color: var(--violet); background: rgba(91,45,142,.04); }
+    .name-app {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--violet-dark);
+    }
+    .name-tagline { font-size: .75rem; color: var(--gray-400); margin-top: .25rem; }
+
+    /* ============================
+       PAGES NAV
+    ============================ */
+    .pages-tabs {
+      display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .page-tab {
+      padding: .55rem 1.25rem; border-radius: 8px;
+      border: 1.5px solid var(--gray-200);
+      background: white; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500;
+      color: var(--gray-600);
+      transition: all .2s;
+    }
+    .page-tab:hover { border-color: var(--violet-light); color: var(--violet); }
+    .page-tab.active { background: var(--violet); color: white; border-color: var(--violet); }
+
+    /* Page frames */
+    .page-frame {
+      background: white; border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);
+      overflow: hidden;
+      display: none;
+    }
+    .page-frame.visible { display: block; }
+
+    /* ============================
+       HOME PAGE MOCKUP
+    ============================ */
+    .mock-hero {
+      background: linear-gradient(135deg, var(--violet-dark), var(--violet));
+      padding: 3rem 2rem; text-align: center; color: white;
+    }
+    .mock-hero h2 {
+      font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; margin-bottom: .5rem;
+    }
+    .mock-hero p { font-size: .9rem; color: rgba(255,255,255,.7); max-width: 420px; margin: 0 auto 1.5rem; }
+    .mock-cards {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem;
+      padding: 1.5rem 2rem;
+    }
+    .mock-card {
+      border: 1px solid var(--gray-200); border-radius: var(--radius);
+      padding: 1.25rem; transition: all .2s; cursor: pointer;
+    }
+    .mock-card:hover { border-color: var(--violet-light); box-shadow: var(--shadow-sm); }
+    .mock-card-icon { font-size: 1.8rem; margin-bottom: .5rem; }
+    .mock-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .25rem; }
+    .mock-card p { font-size: .78rem; color: var(--gray-400); line-height: 1.4; }
+
+    /* ============================
+       INGREDIENTS PAGE MOCKUP
+    ============================ */
+    .mock-table { width: 100%; border-collapse: collapse; }
+    .mock-table th {
+      text-align: left; padding: .75rem 1rem;
+      background: var(--gray-50); font-size: .8rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--gray-400); border-bottom: 1px solid var(--gray-200);
+    }
+    .mock-table td {
+      padding: .85rem 1rem; border-bottom: 1px solid var(--gray-100);
+      font-size: .88rem;
+    }
+    .mock-table tr:hover td { background: var(--gray-50); }
+    .badge-pill {
+      display: inline-block; padding: .2rem .65rem;
+      border-radius: 100px; font-size: .72rem; font-weight: 600;
+    }
+
+    /* ============================
+       FOOTER
+    ============================ */
+    footer {
+      background: var(--gray-800); color: rgba(255,255,255,.7);
+      padding: 2rem;
+      margin-top: 4rem;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 700; color: white;
+    }
+    footer p { font-size: .82rem; }
+
+    /* ============================
+       RESPONSIVE
+    ============================ */
+    @media (max-width: 768px) {
+      .mock-cards { grid-template-columns: 1fr; }
+      .ingredient-row { grid-template-columns: 1fr 90px 36px; }
+      .hero-stats { gap: 1.5rem; }
+      .nav-links { display: none; }
+    }
+
+    /* ============================
+       ANIMATIONS
+    ============================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero > * { animation: fadeUp .6s ease both; }
+    .hero > *:nth-child(2) { animation-delay: .1s; }
+    .hero > *:nth-child(3) { animation-delay: .2s; }
+    .hero > *:nth-child(4) { animation-delay: .3s; }
+    .hero > *:nth-child(5) { animation-delay: .45s; }
+  </style>
 </head>
-
 <body>
 
-<header>
-    <h1>🧼 Fabrication de Savon</h1>
-    <nav>
-        <a href="index.html">Accueil</a>
-        <a href="ingredients.html">Ingrédients</a>
-        <a href="recette.html">Procédé</a>
-        <a href="simulation.html">Simulation</a>
-    </nav>
-</header>
+<!-- ========================
+     NAVIGATION
+======================== -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">Savon<span>SAP</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#accueil" class="active">Accueil</a></li>
+      <li><a href="#ingredients">Ingrédients</a></li>
+      <li><a href="#simulation">Simulation</a></li>
+      <li><a href="#indicateurs">Indicateurs</a></li>
+      <li><a href="#" class="nav-cta">Connexion</a></li>
+    </ul>
+  </div>
+</nav>
 
-<section class="container">
-    <h2>Bienvenue</h2>
-    <p>Ce site permet de simuler et documenter la fabrication du savon par saponification à froid.</p>
+<!-- ========================
+     HERO
+======================== -->
+<section class="hero" id="accueil">
+  <div class="hero-badge">🧼 Application de Saponification Professionnelle</div>
+  <h1>Formulez votre <span>savon parfait</span><br/>en quelques clics</h1>
+  <p>Calculez précisément vos dosages de soude, gérez vos ingrédients et conformez-vous aux exigences réglementaires cosmétiques.</p>
+  <div class="hero-actions">
+    <a href="#simulation" class="btn btn-primary">🧪 Lancer une simulation</a>
+    <a href="#indicateurs" class="btn btn-outline">📊 Voir les indicateurs</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-value">40+</div><div class="stat-label">Huiles référencées</div></div>
+    <div class="stat"><div class="stat-value">NaOH</div><div class="stat-label">& KOH calculés</div></div>
+    <div class="stat"><div class="stat-value">RSPC</div><div class="stat-label">Conformité réglementaire</div></div>
+    <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Open source</div></div>
+  </div>
 </section>
+
+<!-- ========================
+     INDICATEURS DE FONCTIONNALITÉ
+======================== -->
+<div class="container" id="indicateurs">
+  <h2 class="section-title">🚦 Indicateurs de fonctionnalité</h2>
+  <p class="section-sub">Activez ou désactivez les modules de l'application en temps réel</p>
+
+  <div class="features-grid">
+
+    <!-- Feature 1 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon violet">🧮</div>
+        <label class="toggle">
+          <input type="checkbox" checked onchange="updateTag(this,'f1-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Simulateur de saponification</div>
+      <div class="feature-desc">Calcul de la soude (NaOH/KOH) à partir des huiles saisies et de leur indice de saponification.</div>
+      <div class="feature-meta">
+        <span class="tag tag-green" id="f1-status">✅ Actif</span>
+        <span class="tag tag-violet">Core</span>
+        <span class="tag tag-gray">v1.0</span>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon green">🌿</div>
+        <label class="toggle">
+          <input type="checkbox" checked onchange="updateTag(this,'f2-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Base de données ingrédients</div>
+      <div class="feature-desc">Accès à la bibliothèque complète d'huiles, beurres et additifs avec leurs indices SAP.</div>
+      <div class="feature-meta">
+        <span class="tag tag-green" id="f2-status">✅ Actif</span>
+        <span class="tag tag-green">Ingrédients</span>
+        <span class="tag tag-gray">v1.0</span>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon amber">📋</div>
+        <label class="toggle">
+          <input type="checkbox" onchange="updateTag(this,'f3-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Génération de recettes PDF</div>
+      <div class="feature-desc">Export de la formule complète au format PDF conforme pour dossier DIP / RSPC.</div>
+      <div class="feature-meta">
+        <span class="tag tag-gray" id="f3-status">⏸ Inactif</span>
+        <span class="tag tag-amber">Export</span>
+        <span class="tag tag-amber">Bêta</span>
+      </div>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon blue">👥</div>
+        <label class="toggle">
+          <input type="checkbox" onchange="updateTag(this,'f4-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Espace multi-utilisateurs</div>
+      <div class="feature-desc">Gestion de comptes, partage de recettes et historique par utilisateur.</div>
+      <div class="feature-meta">
+        <span class="tag tag-gray" id="f4-status">⏸ Inactif</span>
+        <span class="tag tag-blue">Comptes</span>
+        <span class="tag tag-amber">Bêta</span>
+      </div>
+    </div>
+
+    <!-- Feature 5 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon violet">📊</div>
+        <label class="toggle">
+          <input type="checkbox" checked onchange="updateTag(this,'f5-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Tableau de bord analytique</div>
+      <div class="feature-desc">Visualisation des propriétés du savon : dureté, mousse, conditionnement, solubilité.</div>
+      <div class="feature-meta">
+        <span class="tag tag-green" id="f5-status">✅ Actif</span>
+        <span class="tag tag-violet">Analytique</span>
+        <span class="tag tag-gray">v1.1</span>
+      </div>
+    </div>
+
+    <!-- Feature 6 -->
+    <div class="feature-card">
+      <div class="feature-header">
+        <div class="feature-icon green">⚖️</div>
+        <label class="toggle">
+          <input type="checkbox" onchange="updateTag(this,'f6-status')"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="feature-name">Conformité réglementaire (RSPC)</div>
+      <div class="feature-desc">Vérification automatique de la conformité aux directives européennes cosmétiques 1223/2009.</div>
+      <div class="feature-meta">
+        <span class="tag tag-gray" id="f6-status">⏸ Inactif</span>
+        <span class="tag tag-blue">Réglementaire</span>
+        <span class="tag tag-amber">Planifié</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================
+     SIMULATEUR
+======================== -->
+<div class="container" id="simulation" style="padding-top:0">
+  <div class="sim-section">
+    <div class="sim-header">
+      <div>
+        <h2>🧪 Simulation de Saponification</h2>
+        <p>Ajoutez vos huiles et calculez instantanément la quantité de soude nécessaire</p>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="ingredients-list" id="ingredients-list">
+        <div class="ingredient-row">
+          <select>
+            <option>Huile de tournesol (SAP: 0.134)</option>
+            <option>Huile de coco (SAP: 0.190)</option>
+            <option>Huile d'olive (SAP: 0.134)</option>
+            <option>Huile de palme (SAP: 0.141)</option>
+            <option>Beurre de karité (SAP: 0.128)</option>
+            <option>Huile de ricin (SAP: 0.128)</option>
+          </select>
+          <input type="number" value="40" min="0" step="5" placeholder="g"/>
+          <button class="btn-remove" onclick="removeRow(this)">✕</button>
+        </div>
+        <div class="ingredient-row">
+          <select>
+            <option>Huile de coco (SAP: 0.190)</option>
+            <option>Huile de tournesol (SAP: 0.134)</option>
+            <option>Huile d'olive (SAP: 0.134)</option>
+            <option>Huile de palme (SAP: 0.141)</option>
+          </select>
+          <input type="number" value="30" min="0" step="5" placeholder="g"/>
+          <button class="btn-remove" onclick="removeRow(this)">✕</button>
+        </div>
+        <div class="ingredient-row">
+          <select>
+            <option>Huile d'olive (SAP: 0.134)</option>
+            <option>Huile de tournesol (SAP: 0.134)</option>
+            <option>Huile de coco (SAP: 0.190)</option>
+          </select>
+          <input type="number" value="30" min="0" step="5" placeholder="g"/>
+          <button class="btn-remove" onclick="removeRow(this)">✕</button>
+        </div>
+      </div>
+      <div class="sim-actions">
+        <button class="btn-add" onclick="addIngredient()">＋ Ajouter un ingrédient</button>
+        <button class="btn-calc" onclick="calculate()">🧮 Calculer la soude</button>
+      </div>
+      <div class="result-box" id="result-box">
+        <div class="result-main">
+          <div class="result-label">Soude nécessaire (NaOH)</div>
+          <div class="result-value" id="result-naoh">13.60 <span>g</span></div>
+        </div>
+        <div class="result-breakdown">
+          <div class="result-sub">
+            <div class="result-sub-val" id="result-eau">40.80 g</div>
+            <div class="result-sub-label">Eau (3× soude)</div>
+          </div>
+          <div class="result-sub">
+            <div class="result-sub-val" id="result-total">100 g</div>
+            <div class="result-sub-label">Total huiles</div>
+          </div>
+          <div class="result-sub">
+            <div class="result-sub-val">5%</div>
+            <div class="result-sub-label">Surgras</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     MAQUETTES PAGES
+======================== -->
+<div class="container" id="ingredients">
+  <h2 class="section-title">📱 Maquettes des pages</h2>
+  <p class="section-sub">Naviguez entre les différentes vues de l'application</p>
+
+  <div class="pages-tabs">
+    <button class="page-tab active" onclick="showPage('home',this)">🏠 Accueil</button>
+    <button class="page-tab" onclick="showPage('ingredients-page',this)">🌿 Ingrédients</button>
+    <button class="page-tab" onclick="showPage('procede',this)">⚗️ Procédé</button>
+  </div>
+
+  <!-- HOME MOCKUP -->
+  <div class="page-frame visible" id="page-home">
+    <div class="mock-hero">
+      <h2>Bienvenue sur SavonSAP</h2>
+      <p>Votre assistant de formulation cosmétique pour savons artisanaux</p>
+      <a href="#simulation" class="btn btn-primary" style="display:inline-flex">🧪 Commencer</a>
+    </div>
+    <div class="mock-cards">
+      <div class="mock-card">
+        <div class="mock-card-icon">🌿</div>
+        <h3>Ingrédients</h3>
+        <p>Parcourez la bibliothèque de 40+ huiles et beurres avec leurs indices SAP.</p>
+      </div>
+      <div class="mock-card">
+        <div class="mock-card-icon">🧪</div>
+        <h3>Simulation</h3>
+        <p>Calculez en temps réel la soude nécessaire pour votre formule.</p>
+      </div>
+      <div class="mock-card">
+        <div class="mock-card-icon">⚗️</div>
+        <h3>Procédé</h3>
+        <p>Guide pas à pas pour la fabrication à froid ou à chaud.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INGREDIENTS MOCKUP -->
+  <div class="page-frame" id="page-ingredients-page">
+    <div style="padding:1.5rem 2rem; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700;">Base d'ingrédients</div>
+        <div style="font-size:.82rem;color:var(--gray-400)">40 huiles et beurres référencés</div>
+      </div>
+      <input type="text" placeholder="🔍  Rechercher une huile…" style="padding:.55rem 1rem; border:1.5px solid var(--gray-200); border-radius:8px; font-size:.85rem; width:220px; outline:none;"/>
+    </div>
+    <table class="mock-table">
+      <thead>
+        <tr>
+          <th>Ingrédient</th>
+          <th>Indice SAP (NaOH)</th>
+          <th>Propriétés</th>
+          <th>Famille</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Huile de coco</strong></td>
+          <td>0.190</td>
+          <td><span class="badge-pill" style="background:rgba(122,182,72,.1);color:#5a8a30">Mousse ⭐⭐⭐</span></td>
+          <td><span class="tag tag-green">Tropicale</span></td>
+        </tr>
+        <tr>
+          <td><strong>Huile d'olive</strong></td>
+          <td>0.134</td>
+          <td><span class="badge-pill" style="background:rgba(91,45,142,.1);color:#5b2d8e">Conditionnement ⭐⭐⭐</span></td>
+          <td><span class="tag tag-violet">Méditerranéenne</span></td>
+        </tr>
+        <tr>
+          <td><strong>Huile de palme</strong></td>
+          <td>0.141</td>
+          <td><span class="badge-pill" style="background:rgba(245,158,11,.1);color:#d97706">Dureté ⭐⭐⭐</span></td>
+          <td><span class="tag tag-amber">Végétale</span></td>
+        </tr>
+        <tr>
+          <td><strong>Beurre de karité</strong></td>
+          <td>0.128</td>
+          <td><span class="badge-pill" style="background:rgba(59,130,246,.1);color:#2563eb">Nourrissant ⭐⭐⭐</span></td>
+          <td><span class="tag tag-blue">Beurre</span></td>
+        </tr>
+        <tr>
+          <td><strong>Huile de ricin</strong></td>
+          <td>0.128</td>
+          <td><span class="badge-pill" style="background:rgba(122,182,72,.1);color:#5a8a30">Mousse crémeuse ⭐⭐</span></td>
+          <td><span class="tag tag-green">Spéciale</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PROCEDE MOCKUP -->
+  <div class="page-frame" id="page-procede">
+    <div style="padding:2rem;">
+      <div style="font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:700; margin-bottom:1.5rem; color:var(--violet-dark)">⚗️ Guide de fabrication — Saponification à froid</div>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="display:flex;gap:1rem;align-items:flex-start; padding:1rem;border-radius:10px;border:1px solid var(--gray-200);">
+          <div style="background:var(--violet);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+          <div><strong>Préparer les huiles</strong> — Peser et faire fondre les corps solides (beurres, huile de coco). Mélanger toutes les huiles à ~40°C.</div>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:flex-start; padding:1rem;border-radius:10px;border:1px solid var(--gray-200);">
+          <div style="background:var(--violet);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+          <div><strong>Préparer la lessive de soude</strong> — Dissoudre la soude dans l'eau froide (jamais l'inverse !). Laisser refroidir à ~40°C.</div>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:flex-start; padding:1rem;border-radius:10px;border:1px solid var(--gray-200);">
+          <div style="background:var(--green);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+          <div><strong>Mélanger et mixer</strong> — Verser la soude sur les huiles en filet. Mixer par alternances jusqu'à la trace légère.</div>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:flex-start; padding:1rem;border-radius:10px;border:1px solid var(--gray-200);">
+          <div style="background:var(--green);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
+          <div><strong>Mouler et laisser reposer</strong> — Couler dans les moules, emballer et laisser 24–48h. Démouler puis curer 4–6 semaines.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     NOMS PROPOSÉS
+======================== -->
+<div class="container">
+  <h2 class="section-title">💡 Propositions de noms</h2>
+  <p class="section-sub">Cliquez sur un nom pour le sélectionner — plusieurs propositions pour le client</p>
+  <div class="names-grid">
+    <div class="name-card selected" onclick="selectName(this)">
+      <div class="name-app">SavonSAP</div>
+      <div class="name-tagline">Simple, tech, mémorisable</div>
+    </div>
+    <div class="name-card" onclick="selectName(this)">
+      <div class="name-app">SapoFormul</div>
+      <div class="name-tagline">Formulation + saponification</div>
+    </div>
+    <div class="name-card" onclick="selectName(this)">
+      <div class="name-app">AlkaSoap</div>
+      <div class="name-tagline">Référence chimique (alcali)</div>
+    </div>
+    <div class="name-card" onclick="selectName(this)">
+      <div class="name-app">SodaForm</div>
+      <div class="name-tagline">Soude + formulaire</div>
+    </div>
+    <div class="name-card" onclick="selectName(this)">
+      <div class="name-app">BulleNature</div>
+      <div class="name-tagline">Savon naturel & artisanal</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     FOOTER
+======================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">SavonSAP</div>
+    <p>Maquette réalisée dans le cadre du projet étudiant — Inspirée d'<strong style="color:white">ADEPRO Consultant</strong></p>
+    <p style="font-size:.75rem">© 2026 — Projet académique</p>
+  </div>
+</footer>
+
+<!-- ========================
+     JAVASCRIPT
+======================== -->
+<script>
+  const SAP_VALUES = {
+    'Huile de tournesol': 0.134,
+    'Huile de coco':      0.190,
+    "Huile d'olive":      0.134,
+    'Huile de palme':     0.141,
+    'Beurre de karité':   0.128,
+    'Huile de ricin':     0.128,
+  };
+
+  function updateTag(checkbox, tagId) {
+    const tag = document.getElementById(tagId);
+    tag.className = checkbox.checked ? 'tag tag-green' : 'tag tag-gray';
+    tag.textContent = checkbox.checked ? '✅ Actif' : '⏸ Inactif';
+  }
+
+  function addIngredient() {
+    const list = document.getElementById('ingredients-list');
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+      <select>
+        <option>Huile de tournesol (SAP: 0.134)</option>
+        <option>Huile de coco (SAP: 0.190)</option>
+        <option>Huile d'olive (SAP: 0.134)</option>
+        <option>Huile de palme (SAP: 0.141)</option>
+        <option>Beurre de karité (SAP: 0.128)</option>
+        <option>Huile de ricin (SAP: 0.128)</option>
+      </select>
+      <input type="number" value="20" min="0" step="5" placeholder="g"/>
+      <button class="btn-remove" onclick="removeRow(this)">✕</button>
+    `;
+    list.appendChild(row);
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function removeRow(btn) {
+    btn.closest('.ingredient-row').remove();
+  }
+
+  function calculate() {
+    const rows = document.querySelectorAll('#ingredients-list .ingredient-row');
+    let totalNaOH = 0;
+    let totalOil = 0;
+    const surgras = 0.05;
+
+    rows.forEach(row => {
+      const selectText = row.querySelector('select').value;
+      const weight = parseFloat(row.querySelector('input').value) || 0;
+      totalOil += weight;
+
+      // Extract SAP value from option text
+      const match = selectText.match(/SAP:\s*([\d.]+)/);
+      const sap = match ? parseFloat(match[1]) : 0.134;
+      totalNaOH += weight * sap * (1 - surgras);
+    });
+
+    document.getElementById('result-naoh').innerHTML = `${totalNaOH.toFixed(2)} <span>g</span>`;
+    document.getElementById('result-eau').textContent = `${(totalNaOH * 3).toFixed(1)} g`;
+    document.getElementById('result-total').textContent = `${totalOil} g`;
+  }
+
+  function showPage(pageId, btn) {
+    document.querySelectorAll('.page-frame').forEach(f => f.classList.remove('visible'));
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('visible');
+    btn.classList.add('active');
+  }
+
+  function selectName(card) {
+    document.querySelectorAll('.name-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  }
+</script>
 
 </body>
 </html>
-
